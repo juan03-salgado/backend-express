@@ -27,17 +27,32 @@ export const getComprasId = async (req, res) => {
     }
 };
 
-export const crearCompras = async (req, res) => {
+export const realizarCompras = async (req, res) => {
     try {
         const { id_carrito } = req.body;
+        
         const [resultado] = await db.query("INSERT INTO compras_realizadas (id_carrito) VALUE (?)",
-        [id_carrito]
-    );
-        res.json({ id: resultado.insertId, id, id_carrito});
+            [id_carrito]
+        );
+        
+        const [productoCarrito] = await db.query("SELECT id_producto, cantidad FROM carrito_producto WHERE id_carrito = ?", 
+            [id_carrito]
+        );
+
+        for(const p of productoCarrito){
+            await db.query("UPDATE productosagricolas SET unidades = unidades - ? WHERE id = ?",
+                [p.cantidad, p.id_producto]
+            );
+        }
+
+        await db.query("DELETE FROM carrito_producto WHERE id_carrito = ?", 
+            [id_carrito]
+        );
+
+        res.json({message: "Compra realizada con exito", id_compra: resultado.insertId})
 
     } catch (error) {
         res.status(500).json({ error: error.message})
-
     }
 };
 
