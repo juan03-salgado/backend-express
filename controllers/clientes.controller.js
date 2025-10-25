@@ -2,7 +2,7 @@ import db from "../db.js";
 
 export const getClientes = async (req, res) => {
     try{
-        const [resultado] = await db.query("SELECT * FROM clientes");
+        const [resultado] = await db.query(`SELECT id, nombre, direccion, telefono, 'cliente' AS rol FROM clientes`);
         res.json(resultado);
     } catch (error) {
         res.status(500).json({ error: error.message });     
