@@ -1,9 +1,14 @@
 import db from "../db.js";
 
 export const getCarritoProducto = async (req, res) => {
-
     try{
-        const [resultado] = await db.query("SELECT * FROM carrito_producto");
+        const [resultado] = await db.query(`
+        SELECT c.id, c.cantidad, c.precio_total, c.id_carrito,
+        JSON_OBJECT( 'id', p.id, 'nombre', p.nombre, 'precio_unidad', p.precio_unidad, 'tipo_producto', p.tipo_producto) 
+        AS producto
+        FROM carrito_producto c
+        INNER JOIN productosagricolas p ON c.id_producto = p.id
+    `);
         res.json(resultado);
     } catch (error) {
         res.status(500).json({ error: error.message });     
@@ -65,7 +70,7 @@ export const añadirCarrito = async (req, res) => {
         } else {
             
             const precio_total = precio_unidad * cantidad;
-            const [resultado] = await db.query("INSERT INTO carrito_producto (id_producto, cantidad, precio_total, id_carrito) VALUE (?, ?, ?, ?)",
+            const [resultado] = await db.query("INSERT INTO carrito_producto (id_producto, cantidad, precio_total, id_carrito) VALUES (?, ?, ?, ?)",
             [id_producto, cantidad, precio_total, id_carrito]
         );
             return res.json({ id: resultado.insertId, id_producto, cantidad, precio_total, id_carrito, message: "Producto agregado al carrito"});   
