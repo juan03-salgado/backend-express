@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 import fincasRoutes from "./routes/fincasRoutes.js";
 import clientesRoutes from "./routes/clientesRoutes.js";
 import productosRoutes from "./routes/productosRoutes.js";
@@ -22,6 +23,7 @@ app.use(express.json());
 
 app.use("/fincas", fincasRoutes);
 app.use("/clientes", clientesRoutes);
+app.use("/uploads", express.static(path.join(process.cwd(),"uploads")));
 app.use("/productos", productosRoutes);
 app.use("/proveedores", proveedoresRoutes);
 app.use("/insumos", insumosRoutes);

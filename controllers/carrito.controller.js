@@ -4,11 +4,11 @@ export const getCarrito = async (req, res) => {
 
     try{
         const [resultado] = await db.query(`SELECT c.id, c.id_cliente,
-            JSON_OBJECT('id', cli.id, 'nombre', cli.nombre, 'direccion', cli.direccion, 'telefono', cli.telefono, 'tipo_usuario', cli.id_user)
-            AS cliente
-            FROM carrito c
-            INNER JOIN clientes cli ON c.id_cliente = cli.id  
-        `);
+        JSON_OBJECT('id', cli.id, 'nombre', cli.nombre, 'direccion', cli.direccion, 'telefono', cli.telefono,'tipo_usuario', u.id_rol) AS cliente
+        FROM carrito c
+        INNER JOIN clientes cli ON c.id_cliente = cli.id
+        INNER JOIN usuarios u ON cli.id_user = u.id
+    `);
         res.json(resultado);
     } catch (error) {
         res.status(500).json({ error: error.message });     
@@ -19,11 +19,12 @@ export const getCarritoId = async (req, res) => {
     try {
         const {id} = req.params;
         const [resultado] = await db.query(`SELECT c.id, c.id_cliente,
-            JSON_OBJECT('id', cli.id, 'nombre', cli.nombre, 'direccion', cli.direccion, 'telefono', cli.telefono, 'tipo_usuario', cli.id_user)
-            AS cliente
-            FROM carrito c
-            INNER JOIN clientes cli ON c.id_cliente = cli.id WHERE c.id = ?
-        `, [id]);
+        JSON_OBJECT('id', cli.id, 'nombre', cli.nombre, 'direccion', cli.direccion, 'telefono', cli.telefono,'tipo_usuario', u.id_rol) AS cliente
+        FROM carrito c
+        INNER JOIN clientes cli ON c.id_cliente = cli.id
+        INNER JOIN usuarios u ON cli.id_user = u.id
+        WHERE c.id = ?
+    `, [id]);
 
         if (resultado.length === 0){
             return res.status(404).json({ error : "Carrito no encontrado"})

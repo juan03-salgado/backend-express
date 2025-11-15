@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { getProductos, getProductosId, crearProductos, actualizarProductos, eliminarProductos } from "../controllers/productosAgricolas.controller.js";
+import { getProductos, getProductosId, crearProductos, actualizarProductos, eliminarProductos, upload } from "../controllers/productosAgricolas.controller.js";
 
 const router = Router();
 
 router.get("/", getProductos);
 router.get("/:id", getProductosId);
-router.post("/", crearProductos);
-router.put("/:id", actualizarProductos);
+router.post("/", upload.single("imagen"), crearProductos);
+router.put("/:id", upload.single("imagen"), actualizarProductos);
 router.delete("/:id", eliminarProductos);
 
 export default router;

@@ -3,7 +3,7 @@ import db from "../db.js";
 export const getCompras = async (req, res) => {
 
     try{
-        const [resultado] = await db.query(`SELECT cr.id AS id_compra, cr.id_carrito,cl.nombre AS cliente,
+        const [resultado] = await db.query(`SELECT cr.id AS id_compra, cr.id_carrito, cr.referencia_pago, cl.nombre AS cliente,
         JSON_ARRAYAGG(
           JSON_OBJECT('id_producto', p.id,'producto', p.nombre,'tipo_producto', p.tipo_producto,'cantidad', dc.cantidad,'precio_total', dc.precio_total)
         ) AS productos
@@ -12,7 +12,7 @@ export const getCompras = async (req, res) => {
         INNER JOIN clientes cl ON c.id_cliente = cl.id
         INNER JOIN detalle_compra dc ON dc.id_compra = cr.id
         INNER JOIN productosagricolas p ON dc.id_producto = p.id
-        GROUP BY cr.id, cr.id_carrito, cl.nombre
+        GROUP BY cr.id, cr.id_carrito, cl.nombre, cr.referencia_pago
         ORDER BY cr.id;
     `);
         res.json(resultado);
@@ -25,7 +25,7 @@ export const getCompras = async (req, res) => {
 export const getComprasId = async (req, res) => {
     try {
         const {id} = req.params;
-        const [resultado] = await db.query(`SELECT cr.id AS id_compra, cr.id_carrito, cl.nombre AS cliente,
+        const [resultado] = await db.query(`SELECT cr.id AS id_compra, cr.id_carrito, cr.referencia_pago, cl.nombre AS cliente,
         JSON_ARRAYAGG(
           JSON_OBJECT('id_producto', p.id, 'producto', p.nombre, 'tipo_producto', p.tipo_producto, 
           'cantidad', dc.cantidad,'precio_total', dc.precio_total)
@@ -36,7 +36,7 @@ export const getComprasId = async (req, res) => {
         INNER JOIN detalle_compra dc ON dc.id_compra = cr.id
         INNER JOIN productosagricolas p ON dc.id_producto = p.id
         WHERE cr.id = ?
-        GROUP BY cr.id, cr.id_carrito, cl.nombre
+        GROUP BY cr.id, cr.id_carrito, cl.nombre, cr.referencia_pago
     `, 
         [id]
     );
@@ -65,8 +65,10 @@ export const realizarCompras = async (req, res) => {
             return res.status(400).json({ message: "El carrito esta vacio"})
         }
 
-        const [resultado] = await db.query("INSERT INTO compras_realizadas (id_carrito) VALUES (?)",
-            [id_carrito]
+        const referenciaPago = 'REF-' + Math.floor(100000 + Math.random() * 900000);
+
+        const [resultado] = await db.query("INSERT INTO compras_realizadas (id_carrito, referencia_pago) VALUES (?, ?)",
+            [id_carrito, referenciaPago]
         );
 
         const id_compra = resultado.insertId;
@@ -83,7 +85,7 @@ export const realizarCompras = async (req, res) => {
             [id_carrito]
         );
 
-        res.json({message: "Compra realizada con exito", id_compra: resultado.insertId, productos: productoCarrito})
+        res.json({message: "Compra realizada con exito", id_compra: resultado.insertId, referenciaPago, productos: productoCarrito})
 
     } catch (error) {
         res.status(500).json({ error: error.message})
@@ -112,6 +114,8 @@ export const actualizarCompra = async(req, res) => {
 export const eliminarCompra = async(req, res) => {
     try {
         const {id} = req.params;
+
+        await db.query("DELETE FROM detalle_compra WHERE id_compra = ?", [id])
 
         const [resultado] = await db.query("DELETE FROM compras_realizadas WHERE id = ?",
             [id]
