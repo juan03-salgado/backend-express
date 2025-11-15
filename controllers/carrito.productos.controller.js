@@ -4,7 +4,7 @@ export const getCarritoProducto = async (req, res) => {
     try{
         const [resultado] = await db.query(`
         SELECT c.id, c.cantidad, c.precio_total, c.id_carrito,
-        JSON_OBJECT( 'id', p.id, 'nombre', p.nombre, 'precio_unidad', p.precio_unidad, 'tipo_producto', p.tipo_producto) 
+        JSON_OBJECT('id', p.id, 'nombre', p.nombre, 'precio_unidad', p.precio_unidad, 'tipo_producto', p.tipo_producto) 
         AS producto
         FROM carrito_producto c
         INNER JOIN productosagricolas p ON c.id_producto = p.id
@@ -59,7 +59,7 @@ export const añadirCarrito = async (req, res) => {
         if(existe.length > 0){
             
         const nuevaCantidad = existe[0].cantidad + cantidad;
-        const nuevo_precio = nuevaCantidad * precio_unidad
+        const nuevo_precio = nuevaCantidad * precio_unidad;
         
         await db.query("UPDATE carrito_producto SET cantidad = ?, precio_total = ? WHERE id = ?",
             [nuevaCantidad, nuevo_precio, existe[0].id]
