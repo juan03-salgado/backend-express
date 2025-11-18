@@ -14,7 +14,7 @@ import comprasRoutes from "./routes/comprasRoutes.js";
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:4200",
+  origin: ["http://localhost:4200", "http://agrotech-sa.com", "https://agrotech-sa.com","https://www.agrotech-sa.com","http://www.agrotech-sa.com",],
   methods: ["GET", "POST", "PUT", "DELETE"], 
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
@@ -32,7 +32,8 @@ app.use("/productosCarrito", carritoProductosRoutes);
 app.use("/carrito", carritoRoutes);
 app.use("/compras", comprasRoutes);
 
-app.listen(3000, () => {
-    console.log("El servidor esta escuchando en el puerto 3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`El servidor esta escuchando en el puerto ${PORT}`);
 });
 

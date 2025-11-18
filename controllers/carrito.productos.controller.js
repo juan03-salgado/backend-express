@@ -4,8 +4,7 @@ export const getCarritoProducto = async (req, res) => {
     try{
         const [resultado] = await db.query(`
         SELECT c.id, c.cantidad, c.precio_total, c.id_carrito,
-        JSON_OBJECT('id', p.id, 'nombre', p.nombre, 'precio_unidad', p.precio_unidad, 'tipo_producto', p.tipo_producto) 
-        AS producto
+        JSON_OBJECT('id', p.id, 'nombre', p.nombre, 'precio_unidad', p.precio_unidad, 'tipo_producto', p.tipo_producto, 'unidades', p.unidades) AS producto
         FROM carrito_producto c
         INNER JOIN productosagricolas p ON c.id_producto = p.id
     `);
