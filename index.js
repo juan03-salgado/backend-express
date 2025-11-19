@@ -14,7 +14,7 @@ import comprasRoutes from "./routes/comprasRoutes.js";
 const app = express();
 
 app.use(cors({
-  origin: ["http://localhost:4200", "http://agrotech-sa.com", "https://agrotech-sa.com","https://www.agrotech-sa.com","http://www.agrotech-sa.com",],
+  origin: ["http://localhost:4200", "http://agrotech-sa.com", "https://agrotech-sa.com","https://www.agrotech-sa.com","https://proyect-angular-ten.vercel.app",],
   methods: ["GET", "POST", "PUT", "DELETE"], 
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
